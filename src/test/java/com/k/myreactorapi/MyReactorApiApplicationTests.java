@@ -27,20 +27,22 @@ public class MyReactorApiApplicationTests {
         .uri("/posts/{id}", "1")
         .retrieve()
         .bodyToMono(Post.class);
-    Thread.sleep(10000);
+    postMono.subscribe(this::print);
 
     System.out.println("get flux");
-    postMono.subscribe(System.out::println).dispose();
 
     Flux<Post> postFlux = client.get()
         .uri("/posts")
         .retrieve()
-        .bodyToFlux(Post.class)
-        .checkpoint("flux checkpoint", true);
+        .bodyToFlux(Post.class);
+    postFlux.subscribe(this::print);
 
-    postFlux.subscribe(System.out::println);
     Thread.sleep(10000);
     System.out.println("finished");
+  }
+
+  private void print(Post post) {
+    System.out.println(post.toString());
   }
 
 }

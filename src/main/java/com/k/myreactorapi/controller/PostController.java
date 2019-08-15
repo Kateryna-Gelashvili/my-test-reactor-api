@@ -21,7 +21,7 @@ public class PostController {
 
     @GetMapping
     private Flux getPosts() {
-        return postService.getPostById("1").flux();
+        return postService.getPosts();
     }
 
     @GetMapping("/{id}")

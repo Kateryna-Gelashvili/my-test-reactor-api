@@ -44,5 +44,4 @@ public class MyReactorApiApplicationTests {
   private void print(Post post) {
     System.out.println(post.toString());
   }
-
 }

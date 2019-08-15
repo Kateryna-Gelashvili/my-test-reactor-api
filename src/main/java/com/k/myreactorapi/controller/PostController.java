@@ -25,7 +25,7 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    private Mono<Post> getPostById(@PathVariable String id) {
+    private Mono<Post> getPostById(@PathVariable Integer id) {
         return postService.getPostById(id);
     }
 }

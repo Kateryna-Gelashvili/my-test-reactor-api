@@ -33,7 +33,6 @@
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-postgresql</artifactId>
             <version>1.0.0.M7</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>

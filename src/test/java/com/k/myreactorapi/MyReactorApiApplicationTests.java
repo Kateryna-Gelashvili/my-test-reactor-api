@@ -6,10 +6,16 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {MyReactorApiApplication.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -20,7 +26,19 @@ public class MyReactorApiApplicationTests {
   @Test
   public void contextLoads() throws InterruptedException {
     System.out.println(randomServerPort);
-    WebClient client = WebClient.create("http://localhost:" + randomServerPort);
+    WebClient client = WebClient.builder()
+        .baseUrl("http://localhost:" + randomServerPort)
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .build();
+
+    System.out.println("Posting post");
+    Post postedPost = new Post(null, "post author", "post article");
+    client.post()
+        .uri("/posts")
+        .body(BodyInserters.fromPublisher(Mono.just(postedPost), Post.class))
+        .retrieve()
+        .bodyToMono(Void.class)
+        .block();
 
     System.out.println("get mono");
     Mono<Post> postMono = client.get()
@@ -40,11 +58,10 @@ public class MyReactorApiApplicationTests {
     postFlux.subscribe(this::print);
 
     Post post = postFlux.blockFirst();
-    //    assertEquals(1, post.getId().intValue());
-    //    assertEquals("test author", post.getAuthor());
-    //    assertEquals("test content", post.getArticle());
+    assertNotNull(post.getId());
+    assertEquals("post author", post.getAuthor());
+    assertEquals("post article", post.getArticle());
 
-    Thread.sleep(10000);
     System.out.println("finished");
   }
 

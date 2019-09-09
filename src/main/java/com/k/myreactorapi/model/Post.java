@@ -42,10 +42,9 @@ public class Post {
   }
 
   @Override public String toString() {
-    final StringBuilder sb = new StringBuilder("Post{");
-    sb.append("author='").append(author).append('\'');
-    sb.append(", article='").append(article);
-    sb.append('}');
-    return sb.toString();
+    return "Post{" + "id=" + id
+        + ", author='" + author + '\''
+        + ", article='" + article + '\''
+        + '}';
   }
 }

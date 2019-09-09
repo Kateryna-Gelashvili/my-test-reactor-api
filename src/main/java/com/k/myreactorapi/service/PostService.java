@@ -2,6 +2,7 @@ package com.k.myreactorapi.service;
 
 import com.k.myreactorapi.dao.PostDataDao;
 import com.k.myreactorapi.model.Post;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -16,11 +17,15 @@ public class PostService {
     this.postDataDao = postDataDao;
   }
 
-  public Mono getPostById(Integer id) {
+  public Mono<Post> getPostById(Integer id) {
     return postDataDao.findById(id);
   }
 
   public Flux<Post> getPosts() {
     return postDataDao.findAll();
+  }
+
+  public Mono<Void> addPost(Publisher<Post> postStream) {
+    return postDataDao.saveAll(postStream).then();
   }
 }

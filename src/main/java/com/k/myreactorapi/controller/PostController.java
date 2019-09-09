@@ -2,10 +2,8 @@ package com.k.myreactorapi.controller;
 
 import com.k.myreactorapi.model.Post;
 import com.k.myreactorapi.service.PostService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.reactivestreams.Publisher;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -20,12 +18,17 @@ public class PostController {
   }
 
   @GetMapping
-  private Flux getPosts() {
+  public Flux<Post> getPosts() {
     return postService.getPosts();
   }
 
   @GetMapping("/{id}")
-  private Mono<Post> getPostById(@PathVariable Integer id) {
+  public Mono<Post> getPostById(@PathVariable Integer id) {
     return postService.getPostById(id);
+  }
+
+  @PostMapping
+  public Mono<Void> addPost(@RequestBody Publisher<Post> postStream) {
+    return postService.addPost(postStream);
   }
 }

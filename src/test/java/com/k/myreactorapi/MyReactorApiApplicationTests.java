@@ -29,6 +29,8 @@ public class MyReactorApiApplicationTests {
         .bodyToMono(Post.class);
     postMono.subscribe(this::print);
 
+    Post monoPost = postMono.block();
+
     System.out.println("get flux");
 
     Flux<Post> postFlux = client.get()
@@ -36,6 +38,11 @@ public class MyReactorApiApplicationTests {
         .retrieve()
         .bodyToFlux(Post.class);
     postFlux.subscribe(this::print);
+
+    Post post = postFlux.blockFirst();
+    //    assertEquals(1, post.getId().intValue());
+    //    assertEquals("test author", post.getAuthor());
+    //    assertEquals("test content", post.getArticle());
 
     Thread.sleep(10000);
     System.out.println("finished");

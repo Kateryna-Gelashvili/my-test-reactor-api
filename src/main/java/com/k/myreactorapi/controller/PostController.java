@@ -12,20 +12,20 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/posts")
 public class PostController {
- 
-    private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+  private final PostService postService;
 
-    @GetMapping
-    private Flux getPosts() {
-        return postService.getPosts();
-    }
+  public PostController(PostService postService) {
+    this.postService = postService;
+  }
 
-    @GetMapping("/{id}")
-    private Mono<Post> getPostById(@PathVariable Integer id) {
-        return postService.getPostById(id);
-    }
+  @GetMapping
+  private Flux getPosts() {
+    return postService.getPosts();
+  }
+
+  @GetMapping("/{id}")
+  private Mono<Post> getPostById(@PathVariable Integer id) {
+    return postService.getPostById(id);
+  }
 }

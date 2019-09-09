@@ -1,27 +1,33 @@
 package com.k.myreactorapi.config;
 
-import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
+import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
-import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 //docker run --name postgres -e POSTGRES_PASSWORD=root -e POSTGRES_USER=root -p 5432:5432 -d postgres:11
 @Configuration
-public class R2dbcConfig {
+@EnableR2dbcRepositories(basePackages = "com.k.myreactorapi.dao")
+public class R2dbcConfig extends AbstractR2dbcConfiguration {
+  private final R2DBCConfigurationProperties properties;
+
+  public R2dbcConfig(R2DBCConfigurationProperties properties) {
+    this.properties = properties;
+  }
 
   @Bean
-  public ConnectionFactory connectionFactory(R2DBCConfigurationProperties properties) {
-    ConnectionFactoryOptions connectionFactoryOptions = ConnectionFactoryOptions.builder()
-        .option(USER, properties.getUser())
-        .option(PASSWORD, properties.getPassword())
-        .option(DATABASE, properties.getDatabase())
-        .option(HOST, properties.getHost())
-        .option(PORT, properties.getPort())
-        .option(DRIVER, properties.getDriver())
-        .build();
-
-    return ConnectionFactories.get(connectionFactoryOptions);
+  @Override
+  public ConnectionFactory connectionFactory() {
+    return new PostgresqlConnectionFactory(
+        PostgresqlConnectionConfiguration.builder()
+            .username(properties.getUser())
+            .password(properties.getPassword())
+            .database(properties.getDatabase())
+            .host(properties.getHost())
+            .port(properties.getPort())
+            .build());
   }
 }

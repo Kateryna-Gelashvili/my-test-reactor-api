@@ -15,31 +15,29 @@ import reactor.core.publisher.Mono;
   }
 
   public Mono<Post> getPost(Integer id) {
-    Mono<Post> postMono = Mono.from(connectionFactory.create())
+    return Mono.from(connectionFactory.create())
         .flatMap(c ->
             Mono.from(c.createStatement(
                 "select * from post where id = $1")
                 .bind("$1", id)
                 .execute())
-            .doFinally((st) -> c.close()))
+            .doFinally(st -> c.close()))
         .map(result -> result.map((row, meta) ->
             new Post(row.get("id", Integer.class), row.get("author", String.class),
             row.get("content", String.class))))
         .flatMap(Mono::from);
-    return postMono;
   }
 
   public Flux<Post> getPosts() {
-    Flux<Post> postFlux = Flux.from(connectionFactory.create())
+    return Flux.from(connectionFactory.create())
         .flatMap(c ->
             Flux.from(c.createStatement(
                 "select * from post")
                 .execute())
-                .doFinally((st) -> c.close()))
+                .doFinally(st -> c.close()))
         .map(result -> result.map((row, meta) ->
             new Post(row.get("id", Integer.class), row.get("author", String.class),
                 row.get("content", String.class))))
         .flatMap(Flux::from);
-    return postFlux;
   }
 }

@@ -8,15 +8,18 @@ import org.springframework.context.annotation.Configuration;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 //docker run --name postgres -e POSTGRES_PASSWORD=root -e POSTGRES_USER=root -p 5432:5432 -d postgres:11
-@Configuration public class R2dbcConfig {
-  @Bean public ConnectionFactory connectionFactory() {
+@Configuration
+public class R2dbcConfig {
+
+  @Bean
+  public ConnectionFactory connectionFactory(R2DBCConfigurationProperties properties) {
     ConnectionFactoryOptions connectionFactoryOptions = ConnectionFactoryOptions.builder()
-        .option(USER, "root")
-        .option(PASSWORD, "root")
-        .option(DATABASE, "root")
-        .option(HOST, "localhost")
-        .option(PORT, 5432)
-        .option(DRIVER, "postgresql")
+        .option(USER, properties.getUser())
+        .option(PASSWORD, properties.getPassword())
+        .option(DATABASE, properties.getDatabase())
+        .option(HOST, properties.getHost())
+        .option(PORT, properties.getPort())
+        .option(DRIVER, properties.getDriver())
         .build();
 
     return ConnectionFactories.get(connectionFactoryOptions);

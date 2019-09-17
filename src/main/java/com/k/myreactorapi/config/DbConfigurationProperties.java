@@ -2,8 +2,8 @@ package com.k.myreactorapi.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "r2dbc")
-public class R2DBCConfigurationProperties {
+@ConfigurationProperties(prefix = "db")
+public class DbConfigurationProperties {
   private String user;
   private String password;
   private String database;

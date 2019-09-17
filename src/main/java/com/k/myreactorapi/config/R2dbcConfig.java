@@ -12,9 +12,9 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 @Configuration
 @EnableR2dbcRepositories(basePackages = "com.k.myreactorapi.dao")
 public class R2dbcConfig extends AbstractR2dbcConfiguration {
-  private final R2DBCConfigurationProperties properties;
+  private final DbConfigurationProperties properties;
 
-  public R2dbcConfig(R2DBCConfigurationProperties properties) {
+  public R2dbcConfig(DbConfigurationProperties properties) {
     this.properties = properties;
   }
 

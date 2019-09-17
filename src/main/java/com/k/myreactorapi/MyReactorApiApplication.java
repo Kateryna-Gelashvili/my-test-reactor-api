@@ -1,13 +1,13 @@
 package com.k.myreactorapi;
 
-import com.k.myreactorapi.config.R2DBCConfigurationProperties;
+import com.k.myreactorapi.config.DbConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
-@EnableConfigurationProperties(value = R2DBCConfigurationProperties.class)
+@EnableConfigurationProperties(value = DbConfigurationProperties.class)
 @PropertySource(value = "classpath:config.properties")
 public class MyReactorApiApplication {
 

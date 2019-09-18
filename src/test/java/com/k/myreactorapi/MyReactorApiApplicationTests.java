@@ -16,6 +16,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -25,39 +28,42 @@ public class MyReactorApiApplicationTests {
   @LocalServerPort
   int randomServerPort;
 
+  @Autowired
+  private PostDataDao postDataDao;
+
   @Test
-  public void contextLoads() throws InterruptedException {
-    System.out.println(randomServerPort);
+  public void contextLoads() {
     WebClient client = WebClient.builder()
         .baseUrl("http://localhost:" + randomServerPort)
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build();
 
-    System.out.println("Posting post");
     Post postedPost = new Post(null, "post author", "post article");
-    client.post()
+    Flux<Post> createPost = client.post()
         .uri("/posts")
         .body(BodyInserters.fromPublisher(Mono.just(postedPost), Post.class))
         .retrieve()
-        .bodyToMono(Void.class)
-        .block();
+        .bodyToFlux(Post.class);
 
-    System.out.println("get mono");
     Mono<Post> postMono = client.get()
         .uri("/posts/{id}", "1")
         .retrieve()
-        .bodyToMono(Post.class);
-    postMono.subscribe(this::print);
-
-    Post monoPost = postMono.block();
-
-    System.out.println("get flux");
+        .bodyToMono(Post.class)
+        .doOnError(e -> System.out.println(e.getMessage()));
 
     Flux<Post> postFlux = client.get()
         .uri("/posts")
         .retrieve()
         .bodyToFlux(Post.class);
-    postFlux.subscribe(this::print);
+
+    postDataDao.deleteAll()
+        .thenMany(createPost)
+        .thenMany(createPost)
+        .thenMany(postFlux)
+        .subscribe(this::print);
+
+    await().atMost(1, TimeUnit.MINUTES)
+        .until(() -> postFlux.blockLast() != null);
 
     Post post = postFlux.blockFirst();
     assertNotNull(post.getId());

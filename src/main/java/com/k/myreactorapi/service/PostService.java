@@ -25,7 +25,7 @@ public class PostService {
     return postDataDao.findAll();
   }
 
-  public Mono<Void> addPost(Publisher<Post> postStream) {
-    return postDataDao.saveAll(postStream).then();
+  public Flux<Post> addPost(Publisher<Post> postStream) {
+    return postDataDao.saveAll(postStream);
   }
 }

@@ -3,6 +3,8 @@ package com.k.myreactorapi.controller;
 import com.k.myreactorapi.model.Post;
 import com.k.myreactorapi.service.PostService;
 import org.reactivestreams.Publisher;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,18 +19,20 @@ public class PostController {
     this.postService = postService;
   }
 
-  @GetMapping
+  @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<Post> getPosts() {
     return postService.getPosts();
   }
 
   @GetMapping("/{id}")
-  public Mono<Post> getPostById(@PathVariable Integer id) {
-    return postService.getPostById(id);
+  public Mono<ResponseEntity<Post>> getPostById(@PathVariable Integer id) {
+    return postService.getPostById(id)
+        .map(ResponseEntity::ok)
+        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
-  @PostMapping
-  public Mono<Void> addPost(@RequestBody Publisher<Post> postStream) {
+  @PostMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<Post> addPost(@RequestBody Publisher<Post> postStream) {
     return postService.addPost(postStream);
   }
 }

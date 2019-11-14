@@ -11,7 +11,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,11 +39,12 @@ public class MyReactorApiApplicationTests {
         .build();
 
     Post postedPost = new Post(null, "post author", "post article");
-    Flux<Post> createPost = client.post()
+    Flux<ClientResponse> createPost = client.post()
         .uri("/posts")
-        .body(BodyInserters.fromPublisher(Mono.just(postedPost), Post.class))
-        .retrieve()
-        .bodyToFlux(Post.class);
+        .body(Mono.just(postedPost), Post.class)
+        .exchange()
+        .flux();
+    ClientResponse clientResponse = createPost.blockLast();
 
     Mono<Post> postMono = client.get()
         .uri("/posts/{id}", "1")
@@ -56,12 +57,6 @@ public class MyReactorApiApplicationTests {
         .retrieve()
         .bodyToFlux(Post.class);
 
-    postDataDao.deleteAll()
-        .thenMany(createPost)
-        .thenMany(createPost)
-        .thenMany(postFlux)
-        .subscribe(this::print);
-
     await().atMost(1, TimeUnit.MINUTES)
         .until(() -> postFlux.blockLast() != null);
 
@@ -69,6 +64,12 @@ public class MyReactorApiApplicationTests {
     assertNotNull(post.getId());
     assertEquals("post author", post.getAuthor());
     assertEquals("post article", post.getArticle());
+
+    postDataDao.deleteAll()
+        .thenMany(createPost)
+        .thenMany(createPost)
+        .thenMany(postFlux)
+        .subscribe(this::print);
 
     System.out.println("finished");
   }
